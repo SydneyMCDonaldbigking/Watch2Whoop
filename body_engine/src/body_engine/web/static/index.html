@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="grocery.css">
 <link rel="stylesheet" href="diet-profile.css">
 <link rel="stylesheet" href="jarvis-entry.css">
+<link rel="stylesheet" href="elder-mode.css">
 </head>
 <body>
 <div id="app" hidden>
@@ -30,6 +31,7 @@
       <h1 class="top-title" id="hdr-title" data-i18n="tab.today">今天</h1>
     </div>
     <div class="top-r">
+      <button type="button" class="elder-toggle" data-elder-toggle aria-pressed="false" data-i18n="elder.toggle">大字模式</button>
       <div class="daynav" id="daynav" hidden>
         <button id="day-prev" aria-label="前一天" data-i18n-aria="hdr.prevDay"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8 10 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button id="day-next" aria-label="后一天" data-i18n-aria="hdr.nextDay"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -38,7 +40,12 @@
     </div>
   </header>
   <div id="viewing" class="viewing" role="status" hidden></div>
+  <div id="language-notice" class="viewing" role="status" data-i18n="language.fallbackNotice" hidden></div>
   <div id="banner" class="banner" hidden></div>
+  <div id="elder-toolbar" class="elder-toolbar" role="group" aria-label="便捷操作" data-i18n-aria="elder.actions" hidden>
+    <button type="button" class="btn" id="elder-read" data-i18n="elder.readPage">朗读本页</button>
+    <button type="button" class="btn" id="elder-more" data-i18n="elder.morePages">更多页面</button>
+  </div>
   <div id="ptr" class="ptr" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
 
   <main id="view" class="view" tabindex="-1"></main>
@@ -67,6 +74,7 @@
   <div class="login-card">
     <img src="icon.svg" alt="" width="60" height="60">
     <h1 data-i18n="login.title">身体管理</h1>
+    <button type="button" class="elder-toggle" data-elder-toggle aria-pressed="false" data-i18n="elder.toggle">大字模式</button>
     <ol class="login-steps" id="login-steps" aria-label="登录步骤" data-i18n-aria="登录步骤" hidden>
       <li data-step="email"><i>1</i><span data-i18n="邮箱">邮箱</span></li>
       <li data-step="code"><i>2</i><span data-i18n="验证码">验证码</span></li>
@@ -128,6 +136,7 @@
      page is English. -->
 <script src="i18n.js" defer></script>
 <script type="w2w/lazy" data-lang="en" src="i18n-en.js"></script>
+<script type="w2w/lazy" data-lang="ja" src="i18n-ja.js"></script>
 <script data-w2w="gate" src="lang-gate.js"></script>
 <script src="ios-web.js" defer></script>
 <script src="avatars.js" defer></script>
@@ -161,6 +170,7 @@
 <script src="sync.js" defer></script>
 <script src="sync-repair.js" defer></script>
 <script src="notices.js" defer></script>
+<script src="elder-mode.js" defer></script>
 <script src="offline.js" defer></script>
 <script src="app.js" defer></script>
 </body>

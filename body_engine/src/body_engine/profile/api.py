@@ -58,7 +58,7 @@ class ProfileIn(BaseModel):
     height_cm: float | None = None
     timezone: str | None = Field(default=None, max_length=60)
     goal_weight_kg: float | None = None
-    language: Literal["zh", "en"] | None = None
+    language: Literal["zh", "en", "ja"] | None = None
 
 
 class IntroIn(BaseModel):

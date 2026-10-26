@@ -1,7 +1,7 @@
 """Personal profile: filled in by the user and editable any time (the admin only supplies an email when onboarding; the display name is a placeholder from the email prefix).
 
 Fields: display_name (how to address the user), birth_date, sex (male / female / empty), height_cm, timezone, goal_weight_kg,
-language (zh / en; empty = follow the device language; the Today page language and the AI reply language).
+language (zh / en / ja; empty = follow the device language; the Today page language and the AI reply language).
 - All but goal weight are in the users table; goal weight is written to the status card goal_weight (source user; "distance to goal" uses it); clearing = deleting that item.
 - Missing fields degrade gracefully everywhere: no birthday -> HRmax uses only observed values, body age is not computed; no sex -> VO2max is not compared with norms; no height -> no BMI.
 - missing: items prompted during guided fill-in (display name always exists, so it does not count).
@@ -16,7 +16,7 @@ from ..assistant import status as status_card
 
 SEXES = {"male", "female"}
 SEX_ALIASES = {"m": "male", "男": "male", "f": "female", "女": "female"}
-LANGUAGES = {"zh", "en"}
+LANGUAGES = {"zh", "en", "ja"}
 FIELDS = ("display_name", "birth_date", "sex", "height_cm", "timezone", "goal_weight_kg", "language")
 
 
@@ -69,7 +69,7 @@ def _validate(patch: dict, today: date) -> dict:
             ZoneInfo(v)
         elif k == "language" and v is not None:
             if v not in LANGUAGES:
-                raise ValueError("语言填 zh / en，或者留空（跟随系统）")
+                raise ValueError("语言填 zh / en / ja，或者留空（跟随系统）")
         elif k == "goal_weight_kg" and v is not None:
             v = float(v)
             if not 30 <= v <= 250:

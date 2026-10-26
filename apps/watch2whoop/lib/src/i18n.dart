@@ -1,15 +1,16 @@
-// UI strings: Chinese first, English when the device language is not Chinese.
+// Chinese, English and Japanese UI; untranslated Japanese strings use the existing English text.
 // The language follows the system by default; once signed in, the Today page reports the profile language over the JS channel
-// (`lang:zh` / `lang:en` / `lang:` = follow the system), which is kept as an override until sign-out.
+// (`lang:zh` / `lang:en` / `lang:ja` / `lang:` = system), kept as an override until sign-out.
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'i18n_ja.dart';
 
 const String _kLangKey = 'w2w.lang.v1';
 
 /// JS channel message prefix the Today page uses to report the profile language.
 const String kLangMessagePrefix = 'lang:';
 
-/// Language override: 'zh' / 'en', or null = follow the system language. The root widget listens to it and rebuilds.
+/// Language override: zh / en / ja, or null = follow the system. The root widget listens and rebuilds.
 final ValueNotifier<String?> langOverride = ValueNotifier<String?>(null);
 
 /// 'zh' / 'en' for a language tag such as `zh`, `zh-Hans`, `en_AU`; null for empty or unsupported (= follow the system).
@@ -17,6 +18,7 @@ String? normalizeLang(String? tag) {
   final t = (tag ?? '').trim().toLowerCase();
   if (t == 'zh' || t.startsWith('zh-') || t.startsWith('zh_')) return 'zh';
   if (t == 'en' || t.startsWith('en-') || t.startsWith('en_')) return 'en';
+  if (t == 'ja' || t.startsWith('ja-') || t.startsWith('ja_')) return 'ja';
   return null;
 }
 
@@ -51,7 +53,7 @@ Future<void> setLangOverride(String? lang) async {
 @visibleForTesting
 String Function() systemLanguageCode = () => PlatformDispatcher.instance.locale.languageCode;
 
-String get systemLang => systemLanguageCode() == 'zh' ? 'zh' : 'en';
+String get systemLang => normalizeLang(systemLanguageCode()) ?? 'en';
 
 /// Language the native screens use right now: the override first, else the system language.
 String get currentLang => langOverride.value ?? systemLang;
@@ -74,7 +76,7 @@ Uri withLangFragment(Uri entry) {
   return entry.replace(fragment: parts.join('&'));
 }
 
-String tr(String zh, String en) => isZh ? zh : en;
+String tr(String zh, String en) => isZh ? zh : currentLang == 'ja' ? (nativeJapanese[en] ?? en) : en;
 
 /// Type names in the SDK log -> display names. Unlisted ones are shown as is.
 const Map<String, (String, String)> _typeLabels = {

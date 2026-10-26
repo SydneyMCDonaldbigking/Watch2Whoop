@@ -27,7 +27,7 @@
     document.head.append(Object.assign(document.createElement("style"), { id: "cx-css", textContent: CSS }));
   }
   const on = () => !!root.BodyFlags?.on("muscle_load");
-  const name = (x) => (root.I18N.lang === "en" && x.name_en ? x.name_en : x.name_zh);
+  const name = (x) => (root.I18N.lang !== "zh" && x.name_en ? x.name_en : x.name_zh);
 
   async function load() { D = await C.api(URL); return D; }
 

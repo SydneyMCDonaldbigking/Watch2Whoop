@@ -87,8 +87,8 @@ class Watch2WhoopApp extends StatelessWidget {
           darkTheme: _theme(Brightness.dark),
           home: config.onboardingDone ? const HomePage() : const OnboardingPage(),
           builder: (context, child) => child ?? const SizedBox.shrink(),
-          locale: isZh ? const Locale('zh') : const Locale('en'),
-          supportedLocales: const [Locale('zh'), Locale('en')],
+          locale: Locale(currentLang),
+          supportedLocales: const [Locale('zh'), Locale('en'), Locale('ja')],
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
         );
       },

@@ -59,6 +59,10 @@ void main() {
     await t.pump();
     expect(find.text('Sign in with e-mail'), findsOneWidget);
     expect(currentLang, 'en');
+    await t.tap(find.text('日本語'));
+    await t.pump();
+    expect(currentLang, 'ja');
+    expect(find.text('メールでログイン'), findsOneWidget);
   });
 
   testWidgets('switching keeps the step and what was typed', (t) async {

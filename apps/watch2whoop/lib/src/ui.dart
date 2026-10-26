@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'account_api.dart';
 import 'config.dart';
 import 'i18n.dart';
+import 'i18n_ja.dart';
 import 'platform_features.dart';
 import 'server_lock.dart';
 
@@ -233,13 +234,15 @@ class LangSwitch extends StatelessWidget {
     return ValueListenableBuilder<String?>(
       valueListenable: langOverride,
       builder: (context, _, _) => Semantics(
-        label: '${kLangLabel.$2} / ${kLangLabel.$1}',
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        label: '${kLangLabel.$2} / ${kLangLabel.$1} / ${nativeJapanese['Language']}',
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             option('zh', kLangNames.$1),
             Text('/', style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant)),
             option('en', kLangNames.$2),
+            Text('/', style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant)),
+            option('ja', nativeJapanese['Japanese']!),
           ],
         ),
       ),

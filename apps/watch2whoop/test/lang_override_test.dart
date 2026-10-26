@@ -18,12 +18,14 @@ void main() {
     test('lang:zh / lang:en set the override, lang: follows the system', () {
       expect(parseLangMessage('lang:zh'), (lang: 'zh'));
       expect(parseLangMessage('lang:en'), (lang: 'en'));
+      expect(parseLangMessage('lang:ja'), (lang: 'ja'));
       expect(parseLangMessage('lang:'), (lang: null));
     });
 
     test('regional tags are normalized, unsupported languages follow the system', () {
       expect(parseLangMessage('lang:zh-Hans'), (lang: 'zh'));
       expect(parseLangMessage('lang:en_AU'), (lang: 'en'));
+      expect(parseLangMessage('lang:ja-JP'), (lang: 'ja'));
       expect(parseLangMessage('lang:fr'), (lang: null));
       expect(parseLangMessage('lang: EN '), (lang: 'en'));
     });
@@ -36,6 +38,20 @@ void main() {
   });
 
   group('override', () {
+    test('Japanese follows the device, persists, and falls back to English for missing copy', () async {
+      system = 'ja';
+      expect(currentLang, 'ja');
+      expect(tr('用邮箱登录', 'Sign in with e-mail'), 'メールでログイン');
+      expect(tr('示例', 'Example not translated'), 'Example not translated');
+      await setLangOverride('ja-JP');
+      expect((await SharedPreferences.getInstance()).getString('w2w.lang.v1'), 'ja');
+      expect(withLangFragment(Uri.parse('https://body.example.com/app/#login=EXAMPLE')).fragment,
+          'login=EXAMPLE&lang=ja');
+      langOverride.value = null;
+      await loadLangOverride();
+      expect(langOverride.value, 'ja');
+    });
+
     test('isZh / tr follow the system language without an override', () {
       system = 'zh';
       expect(isZh, isTrue);

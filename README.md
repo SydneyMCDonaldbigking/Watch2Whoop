@@ -74,7 +74,8 @@ There is no hosted demo.
 
 How every score is computed, with references and known limits: [scoring methodology](packages/openbodyscore/METHODOLOGY.md).
 The scoring code is also split out as a standalone library, [`packages/openbodyscore`](packages/openbodyscore/README.md) (Apache-2.0).
-The UI is in Chinese and English. Newer features ship behind feature flags that are off on a fresh install
+This ElderCare fork supports Chinese, English and Japanese language selection. Japanese covers the core interface and falls back to English for untranslated content; see [language support](docs/LANGUAGE_SUPPORT.md).
+Newer features ship behind feature flags that are off on a fresh install
 (`body-engine flags list`, see [docs/rollout.md](docs/rollout.md)).
 
 <p align="center">

@@ -1,7 +1,7 @@
-/* Tiny i18n layer for the Today page and the activation page (issues #13, #42). No build step: load this file first, then i18n-en.js.
-   - Language: the user's profile setting `language` (zh / en, from /v1/web/me, cached in localStorage "be.lang"); empty = follow the device
-     (navigator.language: zh* -> zh, anything else -> en). Before login the login page's 中文 / English switch sets the same localStorage key,
-     and so does #lang=zh|en in the address (the Watch2Whoop app's native sign-in switch).
+/* Tiny i18n layer for the Today page and activation pages. Load this file before the English/Japanese catalogs.
+   - Language: the user's profile setting `language` (zh / en / ja, cached in localStorage "be.lang"); empty = follow the device
+     (zh* -> zh, ja* -> ja, otherwise en). The sign-in language switch and #lang=zh|en|ja set the same preference.
+     Japanese uses English for entries not yet in i18n-ja.js; user data stays as stored.
    - I18N.t(key, params), aliased `tr` in the page scripts (app.js has many locals named `t`). Two kinds of key:
        1. dotted keys ("tab.today"): looked up in the ZH / EN tables below (the shell, from stage 1);
        2. the Chinese source text itself (gettext style): tr("恢复"), tr("{n} 项", { n }). Chinese = the key; English = i18n-en.js.
@@ -25,6 +25,26 @@
     "tab.record": "记录",
     "tab.me": "我",
     "nav.tabs": "页面",
+    "language.fallbackNotice": "日语已支持主要界面，部分内容暂时显示英文。",
+    "elder.toggle": "大字模式",
+    "elder.title": "大字简洁模式",
+    "elder.on": "已开启",
+    "elder.off": "未开启",
+    "elder.actions": "便捷操作",
+    "elder.readPage": "朗读本页",
+    "elder.stopReading": "停止朗读",
+    "elder.morePages": "更多页面",
+    "elder.moreHint": "饮食、记录等原有功能仍可在这里打开。",
+    "elder.description": "放大文字和按钮，提高文字对比度，减少动画。底部保留今天、趋势、记录和我，其他页面可从「更多页面」打开。",
+    "elder.deviceOnly": "仅保存在这台设备上，可随时切回标准界面。不会改变账号或家人的数据权限。朗读只使用设备本地语音。",
+    "elder.enable": "开启大字简洁模式",
+    "elder.disable": "切回标准界面",
+    "elder.enabled": "已开启大字模式，仅保存在这台设备上",
+    "elder.disabled": "已切回标准界面",
+    "elder.notSaved": "界面已切换；此设备无法保存设置，下次打开需重新选择",
+    "elder.noLocalVoice": "这台设备暂无当前语言的本地语音，可使用系统读屏功能",
+    "elder.nothingToRead": "当前页面暂无可朗读的内容",
+    "elder.speechFailed": "朗读已停止，请重试或使用系统读屏功能",
     "hdr.prevDay": "前一天",
     "hdr.nextDay": "后一天",
     "hdr.who": "切换查看的人",
@@ -137,6 +157,26 @@
     "tab.record": "Log",
     "tab.me": "Me",
     "nav.tabs": "Pages",
+    "language.fallbackNotice": "Japanese covers the main interface. Some content is currently shown in English.",
+    "elder.toggle": "Easy view",
+    "elder.title": "Large text & simple view",
+    "elder.on": "On",
+    "elder.off": "Off",
+    "elder.actions": "Quick actions",
+    "elder.readPage": "Read this page",
+    "elder.stopReading": "Stop reading",
+    "elder.morePages": "More pages",
+    "elder.moreHint": "Your existing food and log features are still available here.",
+    "elder.description": "Larger text and buttons, stronger text contrast and less motion. Today, Trends, Log and Me stay in the bottom navigation. Open other pages from More pages.",
+    "elder.deviceOnly": "Saved on this device only. You can switch back at any time. Account and family permissions stay the same. Reading uses only an on-device voice.",
+    "elder.enable": "Turn on easy view",
+    "elder.disable": "Switch to standard view",
+    "elder.enabled": "Easy view is on, saved on this device only",
+    "elder.disabled": "Standard view is on",
+    "elder.notSaved": "View changed. This device cannot save the setting; choose it again next time.",
+    "elder.noLocalVoice": "No on-device voice is available for this language. You can use your system screen reader.",
+    "elder.nothingToRead": "There is no page content to read yet",
+    "elder.speechFailed": "Reading stopped. Try again or use your system screen reader.",
     "hdr.prevDay": "Previous day",
     "hdr.nextDay": "Next day",
     "hdr.who": "Switch person",
@@ -240,18 +280,18 @@
     "activate.iosBanner": "On iPhone, please use the Watch2Whoop app — the web version is being retired",
     "activate.iosBannerLink": "How to install",
   };
-  const TABLES = { zh: ZH, en: EN };
+  const TABLES = { zh: ZH, en: EN, ja: {} };
   const PREF_KEY = "be.lang";
   const UNSAVED_KEY = "be.lang.unsaved";   // chosen on the login page, not yet in the profile (app.js saves it after login)
 
   const device = () => {
     const l = String((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
-    return l.startsWith("zh") ? "zh" : "en";
+    return l.startsWith("zh") ? "zh" : l.startsWith("ja") ? "ja" : "en";
   };
   const readPref = () => { try { return localStorage.getItem(PREF_KEY) || ""; } catch (e) { return ""; } };
   // The app's native sign-in screen passes its 中文 / English choice in the fragment (#…&lang=en): taken like this page's
   // login switch (used now, saved to the profile after login), then removed from the address bar (#login=… stays for app.js)
-  const fromApp = /(?:^#|&)lang=(zh|en)(?=&|$)/.exec(location.hash);
+  const fromApp = /(?:^#|&)lang=(zh|en|ja)(?=&|$)/.exec(location.hash);
   if (fromApp) {
     try { localStorage.setItem(PREF_KEY, fromApp[1]); localStorage.setItem(UNSAVED_KEY, "1"); } catch (e) { /* private mode */ }
     const rest = location.hash.slice(1).split("&").filter((p) => p && !p.startsWith("lang=")).join("&");
@@ -262,7 +302,7 @@
 
   const EN_TEXT = {};   // Chinese source text -> English (filled by i18n-en.js via addEn)
   function t(key, params) {
-    let s = TABLES[lang][key] ?? (lang === "en" ? EN_TEXT[key] : undefined) ?? ZH[key] ?? key;
+    let s = TABLES[lang][key] ?? (lang !== "zh" ? EN_TEXT[key] ?? EN[key] : undefined) ?? ZH[key] ?? key;
     if (params) s = s.replace(/\{(\w+)\}/g, (m, k) => (params[k] != null ? String(params[k]) : m));
     return s;
   }
@@ -270,6 +310,7 @@
   // Locale for Intl / toLocaleString: zh-CN, or the device's English variant (en-AU, en-US …), en-GB otherwise
   const locale = () => {
     if (lang === "zh") return "zh-CN";
+    if (lang === "ja") return "ja-JP";
     const l = (navigator.languages && navigator.languages[0]) || navigator.language || "";
     return /^en\b/i.test(l) ? l : "en-GB";
   };
@@ -288,9 +329,11 @@
 
   function apply(root = document) {
     if (root === document) {
-      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
       const title = document.documentElement.dataset.i18nTitle;
       if (title) document.title = t(title);
+      const notice = document.querySelector("#language-notice");
+      if (notice) notice.hidden = lang !== "ja";
     }
     for (const el of root.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
     for (const el of root.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
@@ -322,7 +365,8 @@
   // After login: the language picked on the login page that the profile does not have yet (null when there is none)
   const unsaved = () => { try { return localStorage.getItem(UNSAVED_KEY) ? (TABLES[readPref()] ? readPref() : null) : null; } catch (e) { return null; } };
   const markSaved = () => { try { localStorage.removeItem(UNSAVED_KEY); } catch (e) { /* private mode */ } };
-  const addEn = (entries) => { Object.assign(EN_TEXT, entries); if (lang === "en") apply(); };
+  const addEn = (entries) => { Object.assign(EN_TEXT, entries); if (lang !== "zh") apply(); };
+  const addJa = (entries) => { Object.assign(TABLES.ja, entries); if (lang === "ja") apply(); };
   // The English text table (i18n-en.js) is only loaded when the page starts in English (lang-gate.js). A page that switches to English
   // without a reload (the login card) awaits this first; it resolves false when the file cannot be fetched.
   let enLoading = null;
@@ -338,11 +382,28 @@
     });
     return enLoading;
   };
+  let jaLoading = null;
+  const ensureLanguage = async (value = lang) => {
+    if (value === "zh") return true;
+    if (!TABLES[value]) return false;
+    const english = await ensureEn();
+    if (value !== "ja") return english;
+    if (Object.keys(TABLES.ja).length) return english;
+    jaLoading ??= new Promise((ok) => {
+      const decl = document.querySelector('script[type="w2w/lazy"][data-lang="ja"]');
+      const script = document.createElement("script");
+      script.src = decl?.getAttribute("src") || "i18n-ja.js";
+      script.onload = () => ok(true);
+      script.onerror = () => { jaLoading = null; ok(false); };
+      document.head.append(script);
+    });
+    return (await jaLoading) && english;
+  };
   // Headers for every API call so server texts (reminders, explain sheets, labels, errors) come back in this language
   const headers = () => ({ "X-Body-Lang": lang });
   const num = (v, d = 0) => Number(v).toLocaleString(locale(), { maximumFractionDigits: d });
 
-  window.I18N = { t, apply, setPref, choose, unsaved, markSaved, addEn, ensureEn, headers, num, locale, dayLabel, monthDay, yearMonth, monthShort, weekdaysMon,
+  window.I18N = { t, apply, setPref, choose, unsaved, markSaved, addEn, addJa, ensureEn, ensureLanguage, headers, num, locale, dayLabel, monthDay, yearMonth, monthShort, weekdaysMon,
     get lang() { return lang; }, tables: TABLES, enText: EN_TEXT };
   apply();   // again when i18n-en.js adds the English text table
 })();

@@ -60,10 +60,10 @@
     ctx.api(`/v1/users/me/training/plan/add-options?exercise=${encodeURIComponent(ex.slug)}`).then((o) => draw(o), fail);
 
     function draw(o) {
-      const name = (root.I18N.lang === "en" && o.exercise.name_en) || o.exercise.name_zh;
+      const name = (root.I18N.lang !== "zh" && o.exercise.name_en) || o.exercise.name_zh;
       const head = `<div class="ap-name">${esc(name)}</div>`;
       if (o.blocked) {
-        const alts = (o.alternatives || []).map((a) => `<button class="item" data-alt="${esc(a.slug)}"><div class="row-title" style="flex:1;text-align:left">${esc((root.I18N.lang === "en" && a.name_en) || a.name_zh)}</div></button>`).join("");
+        const alts = (o.alternatives || []).map((a) => `<button class="item" data-alt="${esc(a.slug)}"><div class="row-title" style="flex:1;text-align:left">${esc((root.I18N.lang !== "zh" && a.name_en) || a.name_zh)}</div></button>`).join("");
         body.innerHTML = `${head}<div class="ap-note ap-bad">${esc(tr("这是禁用动作，不能加入训练计划"))}${o.exercise.reason ? `<br><span class="small muted">${esc(o.exercise.reason)}</span>` : ""}</div>
           ${alts ? `<div class="cat" style="margin-top:12px">${esc(tr("可以改用"))}</div><div class="card list">${alts}</div>` : ""}`;
         for (const b of body.querySelectorAll("[data-alt]")) b.onclick = () => ctx.openDetail(b.dataset.alt, ctx.back);

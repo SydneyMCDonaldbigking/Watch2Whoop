@@ -36,8 +36,8 @@ def test_first_screen_budget():
     names = re.findall(r'<(?:script (?:data-w2w="gate" )?src|link rel="stylesheet" href)="([\w.-]+\.(?:js|css))\?v=[0-9a-f]{12}"', html)
     assert len(names) == len(set(names))
     total = sum((STATIC / n).stat().st_size for n in names)
-    assert len(names) <= 35, len(names)
-    assert total <= 992_500, total   # 980_000 + 12_500 for the jarvis_dial layers that sit beside the old ring menu until the flag is on for everyone (#294 / #309 / #312)
+    assert len(names) <= 37, len(names)   # Two small opt-in elder-view assets; Japanese remains lazy.
+    assert total <= 1_015_000, total   # Existing budget plus the elder-view plugin and locale loader changes.
     for heavy in ("i18n-en.js", "muscle-body-data.js", "intro.js", "grocery.js", "diet-profile.js", "water.js"):
         assert heavy not in names, f"{heavy} is loaded on demand, not at start"
 
@@ -45,7 +45,7 @@ def test_first_screen_budget():
 def test_lazy_scripts_are_declared_and_fingerprinted():
     html = served_page()
     lazy = re.findall(r'<script type="w2w/lazy"(?: data-lang="(\w+)")? src="([\w.-]+\.js)\?v=([0-9a-f]{12})"></script>', html)
-    assert [(lang, name) for lang, name, _ in lazy] == [("en", "i18n-en.js"), ("", "grocery.js"), ("", "diet-profile.js"), ("", "water.js"),
+    assert [(lang, name) for lang, name, _ in lazy] == [("en", "i18n-en.js"), ("ja", "i18n-ja.js"), ("", "grocery.js"), ("", "diet-profile.js"), ("", "water.js"),
                                                         ("", "muscle-body-data.js"), ("", "intro.js"), ("", "sync-status.js")]
     assert re.search(r'<script data-w2w="gate" src="lang-gate\.js\?v=[0-9a-f]{12}"></script>', html)
     # the gate comes after i18n.js (the table adds itself to it) and before the scripts that call tr() when they run
@@ -79,7 +79,7 @@ function run(file, withDocument) {
     navigator: { language: device, languages: [device] },
     document: {
       documentElement: { dataset: {}, lang: "" }, title: "", querySelectorAll: () => [], write: (t) => written.push(t),
-      querySelector: (q) => (/w2w\/lazy/.test(q) ? { getAttribute: () => "i18n-en.js?v=abc123abc123" } : null),
+      querySelector: (q) => (/w2w\/lazy/.test(q) ? { getAttribute: () => q.includes('"ja"') ? "i18n-ja.js?v=abc123abc123" : "i18n-en.js?v=abc123abc123" } : null),
     },
   };
   sandbox.window = sandbox;
@@ -96,6 +96,7 @@ console.log(JSON.stringify({ gate: g.written, lang: i.lang }));
 @pytest.mark.parametrize("hash_, stored, device", [
     ("", "-", "zh-CN"), ("", "-", "zh-Hant-TW"), ("", "-", "en-AU"), ("", "-", ""),
     ("", "zh", "en-AU"), ("", "en", "zh-CN"), ("", "fr", "zh-CN"), ("", "fr", "en-US"),
+    ("", "-", "ja-JP"), ("", "ja", "zh-CN"), ("#lang=ja", "en", "en-AU"),
     ("#lang=en", "zh", "zh-CN"), ("#lang=zh", "en", "en-AU"), ("#login=ABCDEFGH2345&lang=en", "-", "zh-CN"), ("#lang=fr", "-", "zh-CN"),
 ])
 def test_gate_loads_the_english_table_exactly_when_the_page_is_english(hash_, stored, device):
@@ -103,7 +104,10 @@ def test_gate_loads_the_english_table_exactly_when_the_page_is_english(hash_, st
     the table is written into the page when, and only when, i18n.js ends up English."""
     out = json.loads(subprocess.run([NODE, "-e", GATE_HARNESS, str(STATIC / "lang-gate.js"), str(STATIC / "i18n.js"), hash_, stored, device],
                                     capture_output=True, text=True, check=True).stdout)
-    if out["lang"] == "en":
+    if out["lang"] == "ja":
+        assert out["gate"] == ['<script src="i18n-en.js?v=abc123abc123" defer></script>',
+                               '<script src="i18n-ja.js?v=abc123abc123" defer></script>'], out
+    elif out["lang"] == "en":
         assert out["gate"] == ['<script src="i18n-en.js?v=abc123abc123" defer><\\/script>'.replace("<\\/", "</")], out
     else:
         assert out["gate"] == [], out
@@ -112,7 +116,7 @@ def test_gate_loads_the_english_table_exactly_when_the_page_is_english(hash_, st
 def test_english_switch_without_reload_asks_for_the_table():
     i18n = (STATIC / "i18n.js").read_text(encoding="utf-8")
     assert "ensureEn" in i18n and 'script[type="w2w/lazy"][data-lang="en"]' in i18n
-    assert 'if (l === "en") await window.I18N.ensureEn();' in (STATIC / "account.js").read_text(encoding="utf-8")
+    assert 'await window.I18N.ensureLanguage(l);' in (STATIC / "account.js").read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------- start-up requests

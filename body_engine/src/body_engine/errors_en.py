@@ -111,7 +111,7 @@ EXACT: dict[str, str] = {
     "性别填 male / female，或者留空": "Sex: male / female, or leave it empty",
     "身高要在 100–230 cm 之间": "Height must be 100–230 cm",
     "时区不对（例：Australia/Sydney、Asia/Shanghai）": "Time zone is not valid (e.g. Australia/Sydney, Asia/Shanghai)",
-    "语言填 zh / en，或者留空（跟随系统）": "Language: zh / en, or leave it empty (follow the device)",
+    "语言填 zh / en / ja，或者留空（跟随系统）": "Language: zh / en / ja, or leave it empty (follow the device)",
     "目标体重要在 30–250 kg 之间": "Goal weight must be 30–250 kg",
     # ---- health history import (history/)
     "只能给自己导入": "You can only import for yourself",
