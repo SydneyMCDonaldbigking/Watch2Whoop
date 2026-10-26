@@ -1,6 +1,7 @@
 """Language of the texts the Today page shows (issue #42).
 
-The page sends `X-Body-Lang: zh | en` with every API call (web/static/i18n.js `I18N.headers()`); `LangMiddleware` puts it in a
+The page sends `X-Body-Lang: zh | en | ja` with every API call. Japanese currently uses English server copy as its fallback.
+`LangMiddleware` puts it in a
 context variable for the request. Without the header (older clients, Shortcut uploads, MCP / AI clients, CLI) it is zh, so
 everything the AI reads stays as it was. AI tool runs (`assistant.tools.run_tool`) always run in zh, also inside the in-page chat.
 
@@ -11,13 +12,13 @@ from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
 
-LANGS = ("zh", "en")
+LANGS = ("zh", "en", "ja")
 _lang: ContextVar[str] = ContextVar("body_lang", default="zh")
 
 
 def norm(value: str | None) -> str:
     v = (value or "").strip().lower()
-    return "en" if v.startswith("en") else "zh"
+    return "ja" if v.startswith("ja") else "en" if v.startswith("en") else "zh"
 
 
 def lang() -> str:
@@ -25,7 +26,8 @@ def lang() -> str:
 
 
 def is_en() -> bool:
-    return _lang.get() == "en"
+    """Use the available English copy, also as the Japanese fallback for existing bilingual data."""
+    return _lang.get() in ("en", "ja")
 
 
 @contextmanager
@@ -39,12 +41,12 @@ def use_lang(value: str) -> Iterator[None]:
 
 def L(zh: str, en: str) -> str:
     """The text in the current language."""
-    return en if _lang.get() == "en" else zh
+    return en if is_en() else zh
 
 
 def tl(zh: str, table: Mapping[str, str]) -> str:
     """A fixed Chinese label in the current language: `table` maps Chinese -> English; unknown labels are returned as is."""
-    if _lang.get() != "en" or not zh:
+    if not is_en() or not zh:
         return zh
     return table.get(zh, zh)
 

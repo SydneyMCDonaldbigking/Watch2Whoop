@@ -177,7 +177,7 @@ def _plan_push(conn, user_id: int, nid: int, kind: str, now: datetime | None) ->
 
 
 def _alert(row: dict, lang: str) -> dict:
-    en = lang == "en"
+    en = lang in ("en", "ja")
     title = (row["title_en"] if en else None) or row["title"]
     body = (row["body_en"] if en else None) or row["body"]
     return {"title": title, "body": body} if body else {"title": title}
@@ -186,7 +186,7 @@ def _alert(row: dict, lang: str) -> dict:
 def _merged_alert(kind: str, recent: list[dict], lang: str) -> dict:
     actors = {str(r["data"].get("actor_id")) for r in recent if (r["data"] or {}).get("actor_id") is not None}
     n = len(actors) if len(actors) >= 2 else len(recent)
-    i = 1 if lang == "en" else 0
+    i = 1 if lang in ("en", "ja") else 0
     tpl = P.MERGED.get(kind) if len(actors) >= 2 else None
     label = P.CATEGORIES[category_of(kind)]["en" if i else "zh"]
     title = (tpl or P.DEFAULT_MERGED)[i].format(n=n, label=label)

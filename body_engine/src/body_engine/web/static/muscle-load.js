@@ -76,7 +76,7 @@
   const RANGE_NAME = () => ({ today: tr("今天"), week: tr("本周"), last7: tr("近 7 天") });
   const badgeOf = (st) => `<span class="badge ${st === "ok" ? "good" : st === "high" ? "bad" : st === "low" ? "mid" : "plain"}">${esc(STATUS()[st])}</span>`;
   const day = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString(window.I18N.locale(), { month: "numeric", day: "numeric", weekday: "short" });
-  const exName = (e) => (window.I18N.lang === "en" && e.name_en ? e.name_en : e.name);
+  const exName = (e) => (window.I18N.lang !== "zh" && e.name_en ? e.name_en : e.name);
 
   // region -> { status, today, key } from rows [{key, sets, status, today}]. `onlyTrained` = the 今天 view: grey unless trained today.
   function regionStates(rows, range) {
@@ -205,7 +205,7 @@
     const last = d.last ? `${esc(day(d.last.date))}<div>${d.last.exercises.map((e) => `<div class="mml-ex">${esc(exName(e))} · ${esc(tr("{n} 组", { n: e.sets }))}${e.top ? ` · ${esc(e.top)} kg` : ""}${e.primary ? "" : ` · ${esc(tr("辅助"))}`}</div>`).join("")}</div>` : esc(tr("近 4 周没练"));
     const sp = d.sports?.[S.range] || [];
     const sports = sp.map((x) => `<div class="mml-ex"><i class="mml-sw"></i>${esc(x.name)} · ${esc(tr("{n} 分钟", { n: num(x.min) }))} · ${esc(x.primary ? tr("主要") : tr("辅助"))}</div>`).join("");
-    const rec = d.recommended.map((x) => `<button class="mml-rec" data-ex="${esc(x.slug)}"><span style="flex:1">${esc(window.I18N.lang === "en" && x.name_en ? x.name_en : x.name_zh)}${x.equipment_zh?.length && window.I18N.lang !== "en" ? ` <span class="small muted">${esc(x.equipment_zh.join(SEP()))}</span>` : ""}</span>${x.status === "caution" ? `<span class="badge mid">${tr("注意")}</span>` : ""}</button>`).join("");
+    const rec = d.recommended.map((x) => `<button class="mml-rec" data-ex="${esc(x.slug)}"><span style="flex:1">${esc(window.I18N.lang !== "zh" && x.name_en ? x.name_en : x.name_zh)}${x.equipment_zh?.length && window.I18N.lang === "zh" ? ` <span class="small muted">${esc(x.equipment_zh.join(SEP()))}</span>` : ""}</span>${x.status === "caution" ? `<span class="badge mid">${tr("注意")}</span>` : ""}</button>`).join("");
     C.openSheet(d.name, `
       ${sibs.length ? `<div class="mml-sib"><button class="mml-chip" aria-pressed="true">${esc(d.name)}</button>${sibs.map((m) => `<button class="mml-chip" data-sib="${esc(m)}" aria-pressed="false">${esc((S.data.muscles.find((x) => x.key === m) || {}).name || m)}</button>`).join("")}</div>` : ""}
       ${kv(tr("本周"), `${badgeOf(st)} ${num(r.week.sets, 1)} ${tr("组")} · ${num(r.week.volume_kg)} kg`)}

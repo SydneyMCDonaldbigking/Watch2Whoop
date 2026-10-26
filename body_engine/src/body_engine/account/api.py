@@ -143,7 +143,7 @@ def methods(conn=Depends(get_conn)):
 class EmailStartIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: str = Field(min_length=3, max_length=254)
-    lang: str = Field("zh", pattern="^(zh|en)$")
+    lang: str = Field("zh", pattern="^(zh|en|ja)$")
 
 
 @router.post("/v1/auth/email/start")

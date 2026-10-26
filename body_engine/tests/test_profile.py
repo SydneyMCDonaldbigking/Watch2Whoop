@@ -208,6 +208,15 @@ def test_profile_language(client, users, dsn):
     with psycopg.connect(dsn, row_factory=dict_row) as conn:
         assert briefing._me(conn, ids["t1"])["language"] == "en"
         assert "语言：en" in prompt.build_system_prompt(conn, ids["t1"])
+    japanese = {**H(tok["t1"]), "X-Body-Lang": "ja"}
+    r = client.patch("/v1/users/me/profile", json={"language": "ja"}, headers=japanese)
+    assert r.status_code == 200 and r.json()["language"] == "ja", r.text
+    assert client.get("/v1/web/me", headers=japanese).json()["me"]["language"] == "ja"
+    with psycopg.connect(dsn, row_factory=dict_row) as conn:
+        assert briefing._me(conn, ids["t1"])["language"] == "ja"
+        assert "语言：ja" in prompt.build_system_prompt(conn, ids["t1"])
+    # Record the actual English document language, even when the interface is Japanese.
+    assert client.get("/v1/consent", headers=japanese).json()["language"] == "en"
     # other users unaffected; null goes back to "follow the device"
     assert client.get("/v1/users/me/profile", headers=H(tok["t2"])).json()["language"] is None
     assert client.patch("/v1/users/me/profile", json={"language": None}, headers=H(tok["t1"])).json()["language"] is None

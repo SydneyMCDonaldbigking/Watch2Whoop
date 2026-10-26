@@ -3105,7 +3105,7 @@
     return p;
   }
   const HANDBOOK_URL = new URL("handbook/", location.href).href;
-  const handbookStart = () => (I18N.lang === "en" ? new URL("en/", HANDBOOK_URL).href : HANDBOOK_URL);
+  const handbookStart = () => (I18N.lang !== "zh" ? new URL("en/", HANDBOOK_URL).href : HANDBOOK_URL);
   async function loadHandbook(url) {
     const root = $("#hb-body").shadowRoot;
     root.innerHTML = `<p style="text-align:center;opacity:.5;padding:28px 0">…</p>`;
@@ -3756,7 +3756,7 @@
   const weekStart = (iso) => addDays(iso, -((parseDay(iso).getDay() + 6) % 7));
   const planShort = (planned) => sname(planned[0].name).replace(/（[^）]*）|\([^)]*\)/g, "").split(" / ")[0].trim() || sname(planned[0].name);   // week strip: first session, short (i18n-ok: plan names are data)
 
-  const exName = (x) => (I18N.lang === "en" && x.name_en) || x.name_zh;   // an exercise's name in the page language (both names are in the response)
+  const exName = (x) => (I18N.lang !== "zh" && x.name_en) || x.name_zh;   // an exercise's name in the page language (both names are in the response)
   const exTerms = (list) => (list || []).map((x) => tr(x));   // catalog vocabulary (muscles, equipment, patterns…): English in i18n-en.js
 
   async function swapInPlan(fromSlug, toSlug, btn) {
@@ -3786,7 +3786,7 @@
     const pic = a.thumb ? `<img class="pv-img" src="${esc(a.thumb)}" alt="${esc(exName(a))}" loading="lazy" decoding="async">`
       : window.BodyMuscleMap ? `<div class="pv-map">${window.BodyMuscleMap.html(a.primary_muscles, a.secondary_muscles)}</div>` : "";
     const st = a.status === "banned" ? badge("bad", tr("禁用")) : a.status === "caution" ? badge("mid", tr("注意")) : "";
-    const [main, other] = I18N.lang === "en" && a.name_en ? [a.name_en, a.name_zh] : [a.name_zh, a.name_en];   // both names, page language first
+    const [main, other] = I18N.lang !== "zh" && a.name_en ? [a.name_en, a.name_zh] : [a.name_zh, a.name_en];   // both names, page language first
     const el = document.createElement("div");
     el.className = "pv-scrim";
     el.innerHTML = `<div class="pv-card" role="dialog" aria-modal="true" aria-label="${esc(exName(a))}">
@@ -3824,7 +3824,7 @@
       if (retry) retry.onclick = () => exerciseDetailSheet(slugOrName, back);
       return;
     }
-    const [exMain, exOther] = I18N.lang === "en" && ex.name_en ? [ex.name_en, ex.name_zh] : [ex.name_zh, ex.name_en];   // both names, page language first (as in the alternatives card)
+    const [exMain, exOther] = I18N.lang !== "zh" && ex.name_en ? [ex.name_en, ex.name_zh] : [ex.name_zh, ex.name_en];   // both names, page language first (as in the alternatives card)
     $("#sheet-title").textContent = exMain || slugOrName;
     const stBadge = ex.status === "banned" ? badge("bad", tr("禁用")) : ex.status === "caution" ? badge("mid", tr("注意")) : badge("good", tr("正常"));
     const muscles = [...exTerms(ex.equipment_zh).map((q) => badge("plain", q)),
@@ -3843,7 +3843,7 @@
     const basis = ld && ex.status !== "banned" ? loadBasisText(ld) : null;
     const basisV = basis ? `${esc(basis)}${ld.body_weight_kg ? ` <small class="muted">${esc(`${fmtNum(ld.body_weight_kg, 1)} kg × ${ld.bw_fraction}`)}</small>` : ""}` : null;
     const recent = (ex.recent || []).map((r) => kv(shortDay(r.date), esc(r.sets.join(" · ")))).join("");
-    const joints = Object.entries(ex.joint_flags_zh || {}).map(([k, v]) => badge(v === "high" ? "bad" : "mid", `${tr(k)}${I18N.lang === "en" ? " · " : ""}${v === "high" ? tr("高") : tr("中")}`)).join("");
+    const joints = Object.entries(ex.joint_flags_zh || {}).map(([k, v]) => badge(v === "high" ? "bad" : "mid", `${tr(k)}${I18N.lang !== "zh" ? " · " : ""}${v === "high" ? tr("高") : tr("中")}`)).join("");
     const steps = (ex.instructions_zh || []).map((s) => `<li>${esc(s)}</li>`).join("");
     const alts = (ex.alternatives || []).map((a, i) => `<button class="item alt-row" data-alt="${i}">
       ${a.thumb ? `<img class="alt-thumb" src="${esc(a.thumb)}" alt="" loading="lazy" decoding="async">` : `<span class="alt-thumb"></span>`}
@@ -3986,7 +3986,7 @@
   const tlogBadge = (st) => { const [tone, word] = TLOG_STATE[st?.state] || TLOG_STATE.unreadable; return badge(tone, word); };
   function trainingLogSheet(st) {
     const html = kv(tr("训练记录"), tlogBadge(st))
-      + (st?.hint ? `<div class="small muted" style="margin:10px 0">${esc((I18N.lang === "en" && st.hint_en) || st.hint)}</div>` : "")
+      + (st?.hint ? `<div class="small muted" style="margin:10px 0">${esc((I18N.lang !== "zh" && st.hint_en) || st.hint)}</div>` : "")
       + `<div class="small muted" id="tlog-err" hidden></div>`
       + (st?.can_connect ? `<div class="btns"><button class="btn btn-primary" id="tlog-connect">${tr("连接")}</button></div>` : "");
     openSheet(tr("训练记录"), html, (body) => {
@@ -4007,7 +4007,7 @@
         return;
       }
       const e = $("#tlog-err", body);
-      const en = I18N.lang === "en";
+      const en = I18N.lang !== "zh";
       e.textContent = (en && (r.error_en || r.hint_en)) || r.error || r.hint || "";
       e.hidden = false;
     } catch (err) {
@@ -4090,7 +4090,7 @@
       const rm = isSelf() && x.slug ? `<button type="button" class="td-rm" data-prm="${esc(x.slug)}" data-ps="${esc(p.name)}" data-pd="${p.day_of_week || ""}" data-pa="${p.added_for_day ? 1 : 0}" aria-label="${esc(tr("移除这个动作"))}" style="float:right;border:0;background:none;color:var(--text-3);font-size:20px;min-width:44px;min-height:44px">×</button>` : "";
       return `<div>${rm}${exerciseRow(x)}</div>`;
     };
-    const gone = (day?.removed || []).map((r) => `<button type="button" class="btn" data-prestore="${esc(r.slug)}" style="min-height:32px;padding:4px 12px;margin:4px 6px 0 0">${esc(I18N.lang === "en" && r.name_en ? r.name_en : r.name_zh || r.slug)} · ${tr("恢复")}</button>`).join("");
+    const gone = (day?.removed || []).map((r) => `<button type="button" class="btn" data-prestore="${esc(r.slug)}" style="min-height:32px;padding:4px 12px;margin:4px 6px 0 0">${esc(I18N.lang !== "zh" && r.name_en ? r.name_en : r.name_zh || r.slug)} · ${tr("恢复")}</button>`).join("");
     const html = (day?.change ? kv(tr("原计划"), esc(day.change.from?.map(sname).join(" · ") || tr("休息"))) : "") + (day?.planned?.length ? day.planned.map((p) => {
       const single = p.exercises.length === 1 && p.exercises[0].name === p.name;
       return `${single ? "" : `<div class="small muted" style="margin:14px 0 2px">${esc(sname(p.name))}</div>`}${p.exercises.map((x) => row(p, x)).join("")}`;

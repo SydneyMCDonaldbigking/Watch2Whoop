@@ -79,7 +79,7 @@
 
   const placeholder = () => `<div class="section td2" id="td2"><div class="section-head"><h2>${tr("今天")}</h2></div><div class="empty faint">…</div></div>`;
 
-  const name = (c) => (window.I18N.lang === "en" && c.name_en ? c.name_en : c.name_zh);
+  const name = (c) => (window.I18N.lang !== "zh" && c.name_en ? c.name_en : c.name_zh);
   const timed = (c) => c.target?.duration_s != null;
   const weighted = (c) => !timed(c) && (c.modality || "weight_reps") === "weight_reps";   // bands / bodyweight: reps only
   const cols = (c) => (weighted(c) ? "" : "one");
@@ -179,7 +179,7 @@
   function removedHtml() {
     const gone = V.removed || [];
     if (!gone.length) return "";
-    return `<div class="td-removed"><span>${C.esc(tr("已移除"))}</span>${gone.map((r) => `<button type="button" data-restore="${C.esc(r.slug)}">${C.esc(window.I18N.lang === "en" && r.name_en ? r.name_en : r.name_zh || r.slug)} · ${C.esc(tr("恢复"))}</button>`).join("")}</div>`;
+    return `<div class="td-removed"><span>${C.esc(tr("已移除"))}</span>${gone.map((r) => `<button type="button" data-restore="${C.esc(r.slug)}">${C.esc(window.I18N.lang !== "zh" && r.name_en ? r.name_en : r.name_zh || r.slug)} · ${C.esc(tr("恢复"))}</button>`).join("")}</div>`;
   }
 
   function planCardHtml() {

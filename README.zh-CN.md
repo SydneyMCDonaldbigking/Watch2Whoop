@@ -69,7 +69,7 @@ cd Watch2Whoop
 | **家人** | 每人一个账号、各自的 token、本人同意才共享、好友圈子 |
 
 每个分数怎么算、参考文献和已知局限：[评分方法论](docs/scoring-methodology.md)。评分代码也拆成了独立的库
-[`packages/openbodyscore`](packages/openbodyscore/README.md)（Apache-2.0）。界面有中文和英文。新功能默认放在功能开关后面，
+[`packages/openbodyscore`](packages/openbodyscore/README.md)（Apache-2.0）。此 ElderCare Fork 支持中文、英文、日语语言选择；日语覆盖主要界面，未翻译内容暂回退到英文，详见[语言支持说明](docs/LANGUAGE_SUPPORT.md)。新功能默认放在功能开关后面，
 新装的服务器上是关着的（`body-engine flags list`，见 [docs/rollout.md](docs/rollout.md)）。
 
 <p align="center">

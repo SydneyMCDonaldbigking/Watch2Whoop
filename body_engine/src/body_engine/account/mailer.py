@@ -52,7 +52,12 @@ def code_message(code: str, minutes: int, lang: str = "zh") -> tuple[str, str]:
             f"{minutes} 分钟内有效，只能用一次。不是你本人操作的话，忽略这封邮件即可。\n\n"
             f"Your Watch2Whoop sign-in code is: {code}\n"
             f"It is valid for {minutes} minutes and works once. If you did not ask for it, ignore this e-mail.\n")
-    if lang == "en":
+    if lang == "ja":
+        subject = f"Watch2Whoop ログイン認証コード: {code}"
+        body = (f"Watch2Whoop のログイン認証コード：{code}\n"
+                f"有効期限は {minutes} 分です。1 回のみ使用できます。心当たりがない場合は、このメールを無視してください。\n\n"
+                + body.split("\n\n", 1)[1])
+    elif lang == "en":
         body = "\n\n".join(reversed(body.split("\n\n")))
     return subject, body
 

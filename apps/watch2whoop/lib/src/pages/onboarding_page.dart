@@ -229,7 +229,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       return;
     }
     await _run(() async {
-      await accountApiFor(_server.text).startEmail(email, lang: isZh ? 'zh' : 'en');
+      await accountApiFor(_server.text).startEmail(email, lang: currentLang);
       _code.clear();
       if (mounted) {
         setState(() {

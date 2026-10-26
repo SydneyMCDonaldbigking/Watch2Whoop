@@ -644,7 +644,7 @@
   function hello() {
     if ($("#ai-chat")?.classList.contains("jv-half")) return;   // the half sheet starts empty (jarvis_orbit); 「继续对话」 adds the greeting
     const extra = [C.ai?.vision === false ? "" : tr("拍照、发视频也可以。"), micOn() ? tr("按住麦克风说话。") : ""].filter(Boolean);
-    const sep = window.I18N.lang === "en" ? " " : "";
+    const sep = window.I18N.lang !== "zh" ? " " : "";
     if ($("#ai-chat")?.classList.contains("v2")) { welcome(extra.join(sep), sep); return; }
     bubble("assistant", [tr("你好，我是你的身体管家。问我今天怎么样，或者告诉我吃了什么、练了什么、哪里不舒服，我帮你记下来。"), ...extra].join(sep));
   }
@@ -1105,7 +1105,7 @@
     const log = c.log?.status === "submitted" ? tr("已提交") : c.log?.done_sets ? tr("已记 {n} 组", { n: c.log.done_sets }) : "";
     const list = !c.exercises?.length ? `<div class="small muted">${esc(c.rest_day ? tr("休息日") : tr("这天没有训练计划"))}</div>`
       : window.BodyTrainingDay?.summaryHtml ? window.BodyTrainingDay.summaryHtml(c.exercises)
-        : `<ul class="ai-card-list">${c.exercises.map((e) => `<li>${esc(window.I18N.lang === "en" && e.name_en ? e.name_en : e.name_zh)}</li>`).join("")}</ul>`;
+        : `<ul class="ai-card-list">${c.exercises.map((e) => `<li>${esc(window.I18N.lang !== "zh" && e.name_en ? e.name_en : e.name_zh)}</li>`).join("")}</ul>`;
     return `${head}${sub ? `<div class="small muted ai-card-sub">${esc(sub)}${log ? ` · ${esc(log)}` : ""}</div>` : ""}${list}`;
   }
   function mealBody(c) {
@@ -1170,7 +1170,7 @@
   const stressBody = (c) => BC().stress?.({ days: c.days }) || none(tr("压力"), c.date);
   const healthspanBody = (c) => { const B = BC(); return c.body_age == null ? (B.healthspan?.(c) || none(tr("身体年龄"))) : `${B.healthspan(c)}<div class="card">${B.healthspanDetail(c)}</div>`; };
   const trendBody = (c) => BC().trend?.(c.metric, c.trend) || none(tr("趋势"));   // the page's "vs 上期" change; weight's change_kg is for the model
-  const vo2Body = (c) => BC().trend?.("vo2max", c.trend, c.level_zh || c.level_label ? { base: esc(window.I18N.lang === "en" ? c.level_label || c.level || "" : c.level_zh || "") } : {}) || none("VO₂max");
+  const vo2Body = (c) => BC().trend?.("vo2max", c.trend, c.level_zh || c.level_label ? { base: esc(window.I18N.lang !== "zh" ? c.level_label || c.level || "" : c.level_zh || "") } : {}) || none("VO₂max");
   const hrZonesBody = (c) => BC().hrZones?.(c.zones) || none(tr("心率区间分布"), c.date);
   const monitorBody = (c) => BC().monitor?.({ metrics: c.metrics }) || none(tr("健康监测"), c.date);
   const reportBody = (c) => (c.current ? `<div class="ai-rep"><div class="ai-card-title">${esc(c.period === "month" ? tr("月报") : tr("周报"))}</div>${BC().report?.(c) || ""}</div>` : none(c.period === "month" ? tr("月报") : tr("周报")));

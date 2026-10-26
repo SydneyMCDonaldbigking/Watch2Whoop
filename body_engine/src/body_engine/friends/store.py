@@ -360,7 +360,7 @@ def leave_all(conn: psycopg.Connection, uid: int) -> int:
 def _personal_name(conn, uid: int) -> str:
     """「Ann 的圈子」 / "Ann's circle" in the owner's language (their profile choice, else the request's)."""
     u = conn.execute("SELECT display_name, language FROM users WHERE id = %s", (uid,)).fetchone()
-    en = (u["language"] or i18n.lang()) == "en"
+    en = (u["language"] or i18n.lang()) in ("en", "ja")
     who = " ".join((u["display_name"] or "").split())
     if not who:
         return "My circle" if en else "我的圈子"

@@ -1,4 +1,4 @@
-/* Loads i18n-en.js (89 KB: the English texts) only when the page is going to be English, so a Chinese user never downloads it.
+/* Loads English for English/Japanese and the Japanese catalog for Japanese, so a Chinese start downloads neither.
    A plain (parser-blocking) script placed right after i18n.js and the lazy declaration in index.html:
      <script type="w2w/lazy" data-lang="en" src="i18n-en.js"></script>   <- the browser neither fetches nor runs this one
      <script data-w2w="gate" src="lang-gate.js"></script>                 <- this file
@@ -11,15 +11,18 @@
 (function () {
   "use strict";
   var lang = "";
-  var fromAddress = /(?:^#|&)lang=(zh|en)(?=&|$)/.exec(location.hash);
+  var fromAddress = /(?:^#|&)lang=(zh|en|ja)(?=&|$)/.exec(location.hash);
   if (fromAddress) lang = fromAddress[1];
   else { try { lang = localStorage.getItem("be.lang") || ""; } catch (e) { lang = ""; } }
-  if (lang !== "zh" && lang !== "en") {
+  if (lang !== "zh" && lang !== "en" && lang !== "ja") {
     var device = String((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
-    lang = device.indexOf("zh") === 0 ? "zh" : "en";
+    lang = device.indexOf("zh") === 0 ? "zh" : device.indexOf("ja") === 0 ? "ja" : "en";
   }
-  if (lang !== "en") return;
-  var decl = document.querySelector('script[type="w2w/lazy"][data-lang="en"]');
-  var src = decl && decl.getAttribute("src");
-  if (src) document.write('<script src="' + encodeURI(src) + '" defer><\/script>');
+  if (lang === "zh") return;
+  // English is also the fallback for Japanese entries that have not been translated yet.
+  ["en"].concat(lang === "ja" ? ["ja"] : []).forEach(function (language) {
+    var decl = document.querySelector('script[type="w2w/lazy"][data-lang="' + language + '"]');
+    var src = decl && decl.getAttribute("src");
+    if (src) document.write('<script src="' + encodeURI(src) + '" defer><\/script>');
+  });
 })();

@@ -36,7 +36,7 @@ class DeviceIn(BaseModel):
     environment: Literal["sandbox", "production"]
     bundle_id: str | None = Field(None, max_length=200)
     app_version: str | None = Field(None, max_length=40)
-    lang: Literal["zh", "en"] | None = None
+    lang: Literal["zh", "en", "ja"] | None = None
 
 
 class DeviceOut(BaseModel):

@@ -26,7 +26,8 @@ void main() {
       final src = _stripComments(f.readAsStringSync());
       for (final m in _literal.allMatches(src)) {
         final lit = m.group(0)!;
-        if (!_cjk.hasMatch(lit)) continue;
+        // Japanese has CJK characters too; its dedicated catalog is checked separately.
+        if (!_cjk.hasMatch(lit) || f.path.endsWith('i18n_ja.dart')) continue;
         final before = src.substring(0, m.start).trimRight();
         final ok = before.endsWith('tr(') || (f.path.endsWith('i18n.dart') && before.endsWith('('));
         if (!ok) {

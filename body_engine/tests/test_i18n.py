@@ -32,12 +32,13 @@ def table(name: str) -> dict[str, str]:
 ZH, EN = table("ZH"), table("EN")
 SCRIPTS = ["app.js", "ai.js", "ai-media.js", "jarvis-entry.js", "account.js", "grocery.js", "profile.js", "diet-profile.js", "water.js", "muscle-map.js", "muscle-load.js", "custom-exercises.js", "journal.js", "exercise-plan.js", "training-day.js", "hevy-import.js", "sleep-detail.js", "feedback.js", "data-status.js", "notify.js", "circles.js", "circle-feed.js", "identities.js", "intro.js", "sync.js", "sync-repair.js", "sync-status.js", "notices.js", "offline.js", "activate.js", "ios-web.js", "oauth.js", "sw.js", "avatars.js", "remarks.js", "md.js", "muscle-body-data.js", "lang-gate.js"]
 PAGES = ["index.html", "activate.html", "install.html", "oauth.html"]
+SCRIPTS.append("elder-mode.js")
 
 
 def test_every_page_script_and_page_is_checked():
     """A page script or HTML page that is not listed above escapes every check below (avatars.js and remarks.js did, #64):
     all of them are in the lists. i18n.js and i18n-en.js are the tables themselves."""
-    scripts = {p.name for p in STATIC.glob("*.js")} - {"i18n.js", "i18n-en.js"}
+    scripts = {p.name for p in STATIC.glob("*.js")} - {"i18n.js", "i18n-en.js", "i18n-ja.js"}
     assert scripts == set(SCRIPTS), {"not listed": sorted(scripts - set(SCRIPTS)), "no such file": sorted(set(SCRIPTS) - scripts)}
     pages = {p.name for p in STATIC.glob("*.html")}
     assert pages == set(PAGES), {"not listed": sorted(pages - set(PAGES)), "no such file": sorted(set(PAGES) - pages)}
@@ -162,7 +163,7 @@ Object.assign(globalThis, {
   localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } },
   history: { replaceState: (a, b, u) => { replaced = u; } },
   location: { hash, pathname: "/app/", search: "" },
-  document: { documentElement: { dataset: {}, lang: "" }, querySelectorAll: () => [], title: "" },
+  document: { documentElement: { dataset: {}, lang: "" }, querySelectorAll: () => [], querySelector: () => null, title: "" },
 });
 Object.defineProperty(globalThis, "navigator", { value: { language: device, languages: [device] }, configurable: true });   // Node 21+ has a read-only one
 vm.runInThisContext(fs.readFileSync(file, "utf8"));
@@ -174,6 +175,8 @@ console.log(JSON.stringify({ lang: window.I18N.lang, replaced, unsaved: window.I
 @pytest.mark.parametrize("hash_, device, lang, replaced, unsaved", [
     ("#login=ABCDEFGH2345&lang=en", "zh-CN", "en", "/app/#login=ABCDEFGH2345", "en"),   # app sign-in: the login code stays for app.js
     ("#lang=zh", "en-AU", "zh", "/app/", "zh"),
+    ("", "ja-JP", "ja", None, None),
+    ("#login=ABCDEFGH2345&lang=ja", "en-AU", "ja", "/app/#login=ABCDEFGH2345", "ja"),
     ("", "en-AU", "en", None, None),                                                  # no choice from the app: device language
     ("#lang=fr", "zh-CN", "zh", None, None),                                          # unsupported: ignored
 ])

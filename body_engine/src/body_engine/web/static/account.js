@@ -230,9 +230,10 @@
     box.className = "login-lang";
     box.id = "login-lang";
     box.setAttribute("role", "group");
-    box.setAttribute("aria-label", "Language / 语言");   // i18n-ok (both names, shown before the language is known)
+    box.setAttribute("aria-label", "Language / 语言 / 言語");   // i18n-ok (language names before the choice is known)
     box.innerHTML = '<button type="button" data-lang="zh" lang="zh-CN">中文</button><span aria-hidden="true">/</span>'   // i18n-ok (language names in their own language)
-      + '<button type="button" data-lang="en" lang="en">English</button>';
+      + '<button type="button" data-lang="en" lang="en">English</button><span aria-hidden="true">/</span>'
+      + '<button type="button" data-lang="ja" lang="ja">日本語</button>';   // i18n-ok (language name)
     host.prepend(box);
     const mark = () => { for (const b of box.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.lang === window.I18N.lang)); };
     mark();
@@ -244,7 +245,7 @@
       try { window.Watch2Whoop?.postMessage("lang:" + l); } catch (err) { /* older app */ }
       if (!changed) return;
       if (!["#le-email", "#le-code", "#ap-code", "#token"].some((id) => $(id)?.value)) { location.reload(); return; }
-      if (l === "en") await window.I18N.ensureEn();   // the English texts are not loaded on a Chinese start (lang-gate.js)
+      await window.I18N.ensureLanguage(l);   // keep entered values when switching without a reload
       window.I18N.apply();
       mark();
       drawHint();

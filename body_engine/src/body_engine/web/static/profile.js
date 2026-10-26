@@ -18,6 +18,7 @@
   const tr = (k, p) => window.I18N.t(k, p);
   const LATER_KEY = "be.profile.later";
   const ZH_NAME = "中文";   // i18n-ok (the language picker shows each language in its own name)
+  const JA_NAME = "日本語";   // i18n-ok (language name)
   const TZS = ["Australia/Sydney", "Australia/Melbourne", "Australia/Brisbane", "Australia/Adelaide", "Australia/Perth",
     "Pacific/Auckland", "Asia/Shanghai", "Asia/Hong_Kong", "Asia/Taipei", "Asia/Singapore", "Asia/Kuala_Lumpur",
     "Asia/Tokyo", "Europe/London", "America/Los_Angeles", "America/New_York"];
@@ -215,7 +216,8 @@
       <div class="field"><label>${tr("profile.tz")}</label><select class="input" id="pf-tz">${tzOptions(p.timezone)}</select></div>
       <div class="field"><label>${tr("profile.lang")}</label><select class="input" id="pf-lang">
         <option value="">${tr("profile.langAuto")}</option><option value="zh"${p.language === "zh" ? " selected" : ""}>${ZH_NAME}</option>
-        <option value="en"${p.language === "en" ? " selected" : ""}>English</option></select></div>
+        <option value="en"${p.language === "en" ? " selected" : ""}>English</option>
+        <option value="ja"${p.language === "ja" ? " selected" : ""}>${JA_NAME}</option></select></div>
       <p class="small muted" id="pf-msg" style="margin-top:10px"></p>
       <div class="btns"><button class="btn btn-primary" id="pf-save">${tr("common.save")}</button>${first ? `<button class="btn" id="pf-later">${tr("profile.later")}</button>` : ""}</div>`,
     (root) => {
