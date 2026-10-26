@@ -24,6 +24,12 @@ Consent documents currently exist only in Chinese and English. Japanese requests
 
 ## Verification and limits
 
+Chinese, English and Japanese previews below use synthetic example data and are not connected to a real health backend.
+
+| 中文 | English | 日本語 |
+|---|---|---|
+| ![Chinese preview](images/elder-care/zh.png) | ![English preview](images/elder-care/en.png) | ![Japanese preview](images/elder-care/ja.png) |
+
 Added catalog/placeholder, locale, persistence/bridge, English-fallback and lazy-loading assertions, plus a profile integration check that persists `ja` and verifies the English consent response. Existing Chinese/English assertions remain enabled. Browser validation uses synthetic fixtures, not real health data. Local JavaScript checks and direct Python assertion calls do not replace the full PostgreSQL/Flutter CI suite. A new Flutter build is required for native-language changes; no local Flutter installation or cloud deployment is performed by this change.
 
 Remaining translation work includes detailed server explanations, the consent and handbook documents, advanced training/AI screens, interpolated native messages and voice-assistant recognition. Japanese language selection is supported; this is not a claim of complete Japanese translation throughout every subsystem.
